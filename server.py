@@ -13,34 +13,35 @@ from string import Template
 #Watson Service Credentials, replace with your credentials from Watson
 d ={
   "url": "https://stream.watsonplatform.net/speech-to-text/api",
-  "username": "aaaaaaaa-1111-bbbb-2222-cccccccccccc",
-  "password": "ABC123def456"
+  "username": "be14501c-7278-40ec-8504-a41be32ba63b",
+  "password": "4iLPpstIpFCU"
 
 }
 
 language_model = 'en-UK_NarrowbandModel' # Specify the Narrowband model for your language
 
-HOSTNAME = 'example.com' #Change to the hostname of your server
+HOSTNAME = 'ec2-18-212-18-2.compute-1.amazonaws.com' #Change to the hostname of your server
 
 
 
 def gettoken():
-    resp = requests.get('https://stream.watsonplatform.net/authorization/api/v1/token', auth=(d['username'], d['password']), params={'url' : d['url']})
+    resp = requests.get('https://stream.watsonplatform.net/authorization/api/v1/token', auth=(d['username'], d['password']),
+			params={'url' : d['url']})
     token = None
     if resp.status_code == 200:
         token = resp.content
     else:
-        print resp.status_code
-        print resp.content
+        print(resp.status_code)
+        print(resp.content)
     return token
 
 
 class MainHandler(tornado.web.RequestHandler):
-	@tornado.web.asynchronous
-	def get(self):
-		self.content_type = 'text/plain'
-		self.write("Watson STT Example")
-		self.finish()
+    @tornado.web.asynchronous
+    def get(self):
+        self.content_type = 'text/plain'
+        self.write("Watson STT Example")
+        self.finish()
 
 
 class CallHandler(tornado.web.RequestHandler):
@@ -60,11 +61,11 @@ class CallHandler(tornado.web.RequestHandler):
 class EventHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     def post(self):
-        print self.request.body
+        print(self.request.body)
         self.content_type = 'text/plain'
         self.write('ok')
         self.finish()
-			
+
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     watson_future = None
@@ -82,7 +83,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             data['action'] = "start"
             data['continuous'] = True
             data['interim_results'] = True
-            print json.dumps(data) 
+            print(json.dumps(data))
             watson.write_message(json.dumps(data), binary=False)
     @gen.coroutine
     def on_close(self):
@@ -93,7 +94,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         watson.close()
     def on_watson_message(self, message):
         #THIS IS WHERE TO HANDLE YOUR RESPONSES FROM WATSON
-        print message
+        print(message)
 
 
 
@@ -107,12 +108,9 @@ def main():
                                             (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': static_path}),
                                         ])
     http_server = tornado.httpserver.HTTPServer(application)
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 22))
     http_server.listen(port)
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
-	main()
-	
-	
-
+    main()
